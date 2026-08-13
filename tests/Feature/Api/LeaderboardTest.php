@@ -60,7 +60,7 @@ it('filters by weekly period', function () {
         'user_id' => $user2->id,
         'game_id' => $game->id,
         'score' => 3000,
-        'created_at' => now()->subDays(2),
+        'created_at' => now()->subHours(2),
     ]);
 
     $response = $this->getJson("/api/games/{$game->slug}/leaderboard?period=weekly");

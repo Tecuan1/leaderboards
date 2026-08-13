@@ -10,13 +10,19 @@ it('submits a score', function () {
     Sanctum::actingAs($user, ['*']);
     $game = Game::factory()->create(['slug' => 'snake']);
 
+    Score::factory()->create(['user_id' => $user->id, 'game_id' => $game->id, 'score' => 2000, 'created_at' => now()->subMonths(2)]);
+    Score::factory()->create(['user_id' => $user->id, 'game_id' => $game->id, 'score' => 1000, 'created_at' => now()->subWeeks(2)]);
+    Score::factory()->create(['user_id' => $user->id, 'game_id' => $game->id, 'score' => 800, 'created_at' => now()->subDays(2)]);
+
     $response = $this->postJson("/api/games/{$game->slug}/scores", [
         'score' => 1500,
     ]);
-
     $response->assertCreated()
         ->assertJsonPath('data.score', 1500)
-        ->assertJsonPath('data.game_id', $game->id);
+        ->assertJsonPath('data.game_id', $game->id)
+        ->assertJsonPath('best_weekly', 1500)
+        ->assertJsonPath('best_monthly', 1500)
+        ->assertJsonPath('best_ever', 2000);
 
     $this->assertDatabaseHas('scores', [
         'user_id' => $user->id,

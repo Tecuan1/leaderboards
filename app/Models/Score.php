@@ -40,4 +40,16 @@ class Score extends Model
             'metadata' => 'array',
         ];
     }
+
+    public static function bestForUserInGame(User|int $user, Game|int $game, ?\DateTimeInterface $since = null): ?int
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+        $gameId = $game instanceof Game ? $game->id : $game;
+
+        return static::query()
+            ->where('user_id', $userId)
+            ->where('game_id', $gameId)
+            ->when($since, fn ($query) => $query->where('created_at', '>=', $since))
+            ->max('score');
+    }
 }
